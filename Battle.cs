@@ -10,7 +10,7 @@ namespace ConsoleGame
     {
         public List<Move> Moves { get; set; }
         public List<Unit> Units { get; set; }
-        public Player player { get; set; }
+        public Player Player { get; set; }
         public Battle()
         {
             LoadMovesFromLines("Moves.txt");
@@ -172,7 +172,7 @@ namespace ConsoleGame
         }
         public void Start()
         {
-            Player player = new Player();
+            Player player = new();
             Console.WriteLine("Tell me your name: ");
             player.Name = Console.ReadLine();
             Console.WriteLine("Welcome {0}! Choose your unit by writing its number. ", player.Name);
@@ -231,10 +231,20 @@ namespace ConsoleGame
                 }
             }
 
-            Fight(chosenUnit, Units[1]);
+            var winnerUnit = Fight(chosenUnit, Units[1]);
+            if (winnerUnit == chosenUnit)
+            {
+                player.NumberOfWins ++;
+                Console.WriteLine("Your unit has won. Your score is now: {0} wins and {1} defeats.", player.NumberOfWins, player.NumberOfLoses);
+            }
+            else
+            {
+                player.NumberOfLoses++;
+                Console.WriteLine("Your unit has lost. Your score is now: {0} wins and {1} defeats.", player.NumberOfWins, player.NumberOfLoses);
+            }
         }
 
-        public void Fight(Unit unit1, Unit unit2)
+        public static Unit Fight(Unit unit1, Unit unit2)
         {
             while(unit1.CurrentHitpoints >= 0 && unit2.CurrentHitpoints >= 0)
             {
@@ -244,7 +254,7 @@ namespace ConsoleGame
                     var speedMemoryUnit1 = unit1.Speed - unit2.Speed;
                     while (speedMemoryUnit1 > 0 && unit1.CurrentHitpoints >= 0 && unit2.CurrentHitpoints >= 0)
                     {
-                        Random random2 = new Random();
+                        Random random2 = new();
                         int numberOfRandomMove2 = random2.Next(0, 4);
                         var randomedMove2 = unit1.UnitMoves[numberOfRandomMove2];
                         while (unit1.CurrentManaPoints < randomedMove2.ManaCost)
@@ -304,7 +314,7 @@ namespace ConsoleGame
 
                     if (unit1.CurrentHitpoints >= 0 && unit2.CurrentHitpoints >= 0)
                     {
-                        Random random = new Random();
+                        Random random = new();
                         int numberOfRandomMove = random.Next(0, 4);
                         var randomedMove = unit2.UnitMoves[numberOfRandomMove];
                         while (unit2.CurrentManaPoints < randomedMove.ManaCost)
@@ -361,50 +371,50 @@ namespace ConsoleGame
                         }
                     }
                 }
-                /*else
+                else //needs fix
                 {
                     if (unit1.Speed < unit2.Speed)
                     {
                         var speedMemoryUnit2 = unit2.Speed - unit1.Speed;
                         while (speedMemoryUnit2 > 0 && unit1.CurrentHitpoints >= 0 && unit2.CurrentHitpoints >= 0)
                         {
-                            Random random = new Random();
-                            int numberOfRandomMove = random.Next(0, 4);
-                            var randomedMove = unit2.UnitMoves[numberOfRandomMove];
-                            while (unit2.CurrentManaPoints < randomedMove.ManaCost)
+                            Random random3 = new();
+                            int numberOfRandomMove3 = random3.Next(0, 4);
+                            var randomedMove3 = unit2.UnitMoves[numberOfRandomMove3];
+                            while (unit2.CurrentManaPoints < randomedMove3.ManaCost)
                             {
-                                numberOfRandomMove = random.Next(0, 4);
-                                randomedMove = unit2.UnitMoves[numberOfRandomMove];
+                                numberOfRandomMove3 = random3.Next(0, 4);
+                                randomedMove3 = unit2.UnitMoves[numberOfRandomMove3];
                             }
-                            Console.WriteLine("{0} uses {1}", unit2.Name, randomedMove.Name);
-                            double damageDealt = (randomedMove.Power + unit2.Attack) * ((100 - unit1.Defense) / 100);
-                            unit2.Attack += randomedMove.AttackModifier;
-                            if (randomedMove.AttackModifier != 0)
+                            Console.WriteLine("{0} uses {1}", unit2.Name, randomedMove3.Name);
+                            double damageDealt = (randomedMove3.Power + unit2.Attack) * ((100 - unit1.Defense) / 100);
+                            unit2.Attack += randomedMove3.AttackModifier;
+                            if (randomedMove3.AttackModifier != 0)
                             {
-                                Console.WriteLine("{0} changed value of its attack by {1}, having it total {2}", unit2.Name, randomedMove.AttackModifier, unit2.Attack);
+                                Console.WriteLine("{0} changed value of its attack by {1}, having it total {2}", unit2.Name, randomedMove3.AttackModifier, unit2.Attack);
                             }
-                            unit2.Defense += randomedMove.DefenseModifier;
-                            if (randomedMove.DefenseModifier != 0)
+                            unit2.Defense += randomedMove3.DefenseModifier;
+                            if (randomedMove3.DefenseModifier != 0)
                             {
-                                Console.WriteLine("{0} changed value of its defense by {1}, having it total {2}", unit2.Name, randomedMove.DefenseModifier, unit2.Defense);
+                                Console.WriteLine("{0} changed value of its defense by {1}, having it total {2}", unit2.Name, randomedMove3.DefenseModifier, unit2.Defense);
                             }
-                            unit2.Speed += randomedMove.SpeedModifier;
-                            if (randomedMove.SpeedModifier != 0)
+                            unit2.Speed += randomedMove3.SpeedModifier;
+                            if (randomedMove3.SpeedModifier != 0)
                             {
-                                Console.WriteLine("{0} changed value of its speed by {1}, having it total {2}", unit2.Name, randomedMove.SpeedModifier, unit2.Speed);
+                                Console.WriteLine("{0} changed value of its speed by {1}, having it total {2}", unit2.Name, randomedMove3.SpeedModifier, unit2.Speed);
                             }
-                            unit2.CurrentManaPoints -= randomedMove.ManaCost;
-                            if (randomedMove.ManaCost != 0)
+                            unit2.CurrentManaPoints -= randomedMove3.ManaCost;
+                            if (randomedMove3.ManaCost != 0)
                             {
-                                Console.WriteLine("{0} uses {1} mana to cast spell, having it total {2}", unit2.Name, randomedMove.ManaCost, unit2.CurrentManaPoints);
+                                Console.WriteLine("{0} uses {1} mana to cast spell, having it total {2}", unit2.Name, randomedMove3.ManaCost, unit2.CurrentManaPoints);
                             }
 
-                            if (unit2.CurrentHitpoints + randomedMove.OwnHitPointsModifier <= unit2.MaxHitPoints)
+                            if (unit2.CurrentHitpoints + randomedMove3.OwnHitPointsModifier <= unit2.MaxHitPoints)
                             {
-                                unit2.CurrentHitpoints += randomedMove.OwnHitPointsModifier;
-                                if (randomedMove.OwnHitPointsModifier != 0)
+                                unit2.CurrentHitpoints += randomedMove3.OwnHitPointsModifier;
+                                if (randomedMove3.OwnHitPointsModifier != 0)
                                 {
-                                    Console.WriteLine("{0} healed itself by {1}, having now {2} hit points.", unit2.Name, randomedMove.OwnHitPointsModifier, unit2.CurrentHitpoints);
+                                    Console.WriteLine("{0} healed itself by {1}, having now {2} hit points.", unit2.Name, randomedMove3.OwnHitPointsModifier, unit2.CurrentHitpoints);
                                 }
                             }
                             else
@@ -413,8 +423,8 @@ namespace ConsoleGame
                                 Console.WriteLine("{0} healed itself to maximum, having now {1} hit points.", unit2.Name, unit2.CurrentHitpoints);
                             }
 
-                            int checkIfHit = random.Next(0, 101);
-                            if (checkIfHit <= randomedMove.Accuracy)
+                            int checkIfHit = random3.Next(0, 101);
+                            if (checkIfHit <= randomedMove3.Accuracy)
                             {
                                 unit1.CurrentHitpoints -= damageDealt;
                                 Console.WriteLine("{0} lost {1} hit points due to attack of {2}, having now {3} hit points", unit1.Name, damageDealt, unit2.Name, unit1.CurrentHitpoints);
@@ -428,43 +438,43 @@ namespace ConsoleGame
 
                         if (unit1.CurrentHitpoints >= 0 && unit2.CurrentHitpoints >= 0)
                         {
-                            Random random2 = new Random();
-                            int numberOfRandomMove2 = random2.Next(0, 4);
-                            var randomedMove2 = unit1.UnitMoves[numberOfRandomMove2];
-                            while (unit1.CurrentManaPoints < randomedMove2.ManaCost)
+                            Random random4 = new();
+                            int numberOfRandomMove4 = random4.Next(0, 4);
+                            var randomedMove4 = unit1.UnitMoves[numberOfRandomMove4];
+                            while (unit1.CurrentManaPoints < randomedMove4.ManaCost)
                             {
-                                numberOfRandomMove2 = random2.Next(0, 4);
-                                randomedMove2 = unit1.UnitMoves[numberOfRandomMove2];
+                                numberOfRandomMove4 = random4.Next(0, 4);
+                                randomedMove4 = unit1.UnitMoves[numberOfRandomMove4];
                             }
-                            Console.WriteLine("{0} uses {1}", unit1.Name, randomedMove2.Name);
-                            double damageDealt2 = (randomedMove2.Power + unit1.Attack) * ((100 - unit2.Defense) / 100);
-                            unit1.Attack += randomedMove2.AttackModifier;
-                            if (randomedMove2.AttackModifier != 0)
+                            Console.WriteLine("{0} uses {1}", unit1.Name, randomedMove4.Name);
+                            double damageDealt2 = (randomedMove4.Power + unit1.Attack) * ((100 - unit2.Defense) / 100);
+                            unit1.Attack += randomedMove4.AttackModifier;
+                            if (randomedMove4.AttackModifier != 0)
                             {
-                                Console.WriteLine("{0} changed value of its attack by {1}, having it total {2}", unit1.Name, randomedMove2.AttackModifier, unit1.Attack);
+                                Console.WriteLine("{0} changed value of its attack by {1}, having it total {2}", unit1.Name, randomedMove4.AttackModifier, unit1.Attack);
                             }
-                            unit1.Defense += randomedMove2.DefenseModifier;
-                            if (randomedMove2.DefenseModifier != 0)
+                            unit1.Defense += randomedMove4.DefenseModifier;
+                            if (randomedMove4.DefenseModifier != 0)
                             {
-                                Console.WriteLine("{0} changed value of its defense by {1}, having it total {2}", unit1.Name, randomedMove2.DefenseModifier, unit1.Defense);
+                                Console.WriteLine("{0} changed value of its defense by {1}, having it total {2}", unit1.Name, randomedMove4.DefenseModifier, unit1.Defense);
                             }
-                            unit1.Speed += randomedMove2.SpeedModifier;
-                            if (randomedMove2.SpeedModifier != 0)
+                            unit1.Speed += randomedMove4.SpeedModifier;
+                            if (randomedMove4.SpeedModifier != 0)
                             {
-                                Console.WriteLine("{0} changed value of its speed by {1}, having it total {2}", unit1.Name, randomedMove2.SpeedModifier, unit1.Speed);
+                                Console.WriteLine("{0} changed value of its speed by {1}, having it total {2}", unit1.Name, randomedMove4.SpeedModifier, unit1.Speed);
                             }
-                            unit1.CurrentManaPoints -= randomedMove2.ManaCost;
-                            if (randomedMove2.ManaCost != 0)
+                            unit1.CurrentManaPoints -= randomedMove4.ManaCost;
+                            if (randomedMove4.ManaCost != 0)
                             {
-                                Console.WriteLine("{0} uses {1} mana to cast spell, having it total {2}", unit1.Name, randomedMove2.ManaCost, unit1.CurrentManaPoints);
+                                Console.WriteLine("{0} uses {1} mana to cast spell, having it total {2}", unit1.Name, randomedMove4.ManaCost, unit1.CurrentManaPoints);
                             }
 
-                            if (unit1.CurrentHitpoints + randomedMove2.OwnHitPointsModifier <= unit1.MaxHitPoints)
+                            if (unit1.CurrentHitpoints + randomedMove4.OwnHitPointsModifier <= unit1.MaxHitPoints)
                             {
-                                unit1.CurrentHitpoints += randomedMove2.OwnHitPointsModifier;
-                                if (randomedMove2.OwnHitPointsModifier != 0)
+                                unit1.CurrentHitpoints += randomedMove4.OwnHitPointsModifier;
+                                if (randomedMove4.OwnHitPointsModifier != 0)
                                 {
-                                    Console.WriteLine("{0} healed itself by {1}, having now {2} hit points.", unit1.Name, randomedMove2.OwnHitPointsModifier, unit1.CurrentHitpoints);
+                                    Console.WriteLine("{0} healed itself by {1}, having now {2} hit points.", unit1.Name, randomedMove4.OwnHitPointsModifier, unit1.CurrentHitpoints);
                                 }
                             }
                             else
@@ -473,8 +483,8 @@ namespace ConsoleGame
                                 Console.WriteLine("{0} healed itself to maximum, having now {1} hit points.", unit1.Name, unit1.CurrentHitpoints);
                             }
 
-                            int checkIfHit2 = random2.Next(0, 101);
-                            if (checkIfHit2 <= randomedMove2.Accuracy)
+                            int checkIfHit2 = random4.Next(0, 101);
+                            if (checkIfHit2 <= randomedMove4.Accuracy)
                             {
                                 unit2.CurrentHitpoints -= damageDealt2;
                                 Console.WriteLine("{0} lost {1} hit points due to attack of {2}, having now {3} hit points", unit2.Name, damageDealt2, unit1.Name, unit2.CurrentHitpoints);
@@ -485,8 +495,16 @@ namespace ConsoleGame
                             }
                         }
                     }
-                }*/
+                }
 
+            }
+            if (unit1.CurrentHitpoints <= 0)
+            {
+                return unit2;
+            }
+            else
+            {
+                return unit1;
             }
         }
     }
